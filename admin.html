@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    
+    <!-- SEO Meta -->
+    <meta name="description" content="Admin Dashboard - Office Supplies Management System - PT Trakindo Utama">
+    <meta name="keywords" content="admin, office supplies, trakindo, management system">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+    <meta name="apple-mobile-web-app-title" content="Trakindo Admin">
+    
+    <title>Admin Dashboard - Trakindo Office Supplies</title>
+    
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
+    
+    <!-- SheetJS untuk Export Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <!-- Admin Styles -->
+    <link rel="stylesheet" href="admin-modern.css">
+    
+    <!-- 🆕 Critical Path Script - Theme harus load sebelum render -->
+    <script>
+        (function() {
+            const theme = localStorage.getItem('admin-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+<body>
+    
+    <!-- ============ ANIMATED BACKGROUND ============ -->
+    <div class="animated-bg">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+        <div class="grid-pattern"></div>
+    </div>
+
+    <!-- ============ LOGIN SECTION ============ -->
+    <div id="login-container" class="login-container">
+        <div class="login-card glass-card">
+            <div class="login-header">
+                <div class="logo-wrapper">
+                    <img src="logo-trakindo.png" alt="Trakindo" class="login-logo">
+                </div>
+                <h1>Admin Dashboard</h1>
+                <p>Office Supplies Management System</p>
+            </div>
+            
+            <form id="login-form" class="login-form">
+                <div class="input-group">
+                    <label for="login-email">
+                        <i class="ph ph-envelope"></i>
+                        Email Admin
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="email" 
+                               id="login-email" 
+                               placeholder="admin@trakindo.co.id" 
+                               required
+                               autocomplete="email">
+                        <div class="input-focus"></div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="login-password">
+                        <i class="ph ph-lock"></i>
+                        Password
+                    </label>
+                    <div class="input-wrapper password-wrapper">
+                        <input type="password" 
+                               id="login-password" 
+                               placeholder="Masukkan password" 
+                               required
+                               autocomplete="current-password">
+                        <button type="button" class="btn-toggle-password" id="togglePassword" aria-label="Toggle password visibility">
+                            <i class="ph ph-eye" id="eyeIcon"></i>
+                        </button>
+                        <div class="input-focus"></div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-primary btn-login" id="loginBtn">
+                    <span class="btn-content" id="login-btn-text">
+                        <i class="ph ph-sign-in"></i>
+                        <span>Masuk ke Dashboard</span>
+                    </span>
+                    <span class="btn-loading" id="login-spinner" style="display: none;">
+                        <div class="spinner"></div>
+                        <span>Memverifikasi...</span>
+                    </span>
+                </button>
+                
+                <p id="login-error" class="error-message"></p>
+            </form>
+            
+            <div class="login-footer">
+                <p>Butuh bantuan? <a href="mailto:it.support@trakindo.co.id">Hubungi IT Support</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ ADMIN DASHBOARD ============ -->
+    <div id="admin-dashboard" class="app-container" style="display: none;">
+        
+        <!-- Glass Header -->
+        <header class="glass-header">
+            <div class="header-inner">
+                <!-- Logo & Brand -->
+                <div class="brand">
+                    <div class="logo-wrapper">
+                        <img src="logo-trakindo.png" alt="Trakindo" class="logo">
+                    </div>
+                    <div class="brand-text">
+                        <h1>Admin Dashboard</h1>
+                        <span class="brand-badge">Office Supplies</span>
+                    </div>
+                </div>
+                
+                <!-- Header Actions -->
+                <div class="header-actions">
+                    <!-- Refresh Button -->
+                    <button class="btn-icon" id="refreshBtn" aria-label="Refresh data">
+                        <i class="ph ph-arrows-clockwise"></i>
+                    </button>
+                    
+                    <!-- Theme Toggle -->
+                    <button class="btn-icon" id="themeToggle" aria-label="Toggle theme">
+                        <i class="ph ph-sun" id="themeLight"></i>
+                        <i class="ph ph-moon" id="themeDark" style="display: none;"></i>
+                    </button>
+                    
+                    <!-- Notifications -->
+                    <button class="btn-icon has-badge" id="notifBtn" aria-label="Notifications">
+                        <i class="ph ph-bell"></i>
+                        <span class="badge" id="notif-badge">0</span>
+                    </button>
+                    
+                    <!-- User Menu -->
+                    <div class="user-menu">
+                        <button class="user-avatar" id="userMenuBtn" aria-label="User menu">
+                            <i class="ph ph-user-circle"></i>
+                        </button>
+                        <div class="user-dropdown" id="user-dropdown">
+                            <div class="user-info">
+                                <div class="user-avatar-large">
+                                    <i class="ph ph-user-circle"></i>
+                                </div>
+                                <p class="user-name" id="admin-name">Admin</p>
+                                <p class="user-email" id="admin-email">admin@trakindo.co.id</p>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a href="index.html" class="dropdown-item">
+                                <i class="ph ph-house"></i>
+                                <span>Ke Halaman Utama</span>
+                            </a>
+                            <button class="dropdown-item" id="settingsBtn">
+                                <i class="ph ph-gear"></i>
+                                <span>Pengaturan</span>
+                            </button>
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item danger" id="logout-button">
+                                <i class="ph ph-sign-out"></i>
+                                <span>Logout</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="dashboard-container">
+                
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="bento-card stat-card stat-pending">
+                        <div class="stat-icon">
+                            <i class="ph ph-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">Tertunda</span>
+                            <p class="stat-number" id="pending-count">0</p>
+                            <span class="stat-desc">Permintaan menunggu</span>
+                        </div>
+                        <div class="stat-trend up">
+                            <i class="ph ph-trend-up"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bento-card stat-card stat-today">
+                        <div class="stat-icon">
+                            <i class="ph ph-calendar-check"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">Hari Ini</span>
+                            <p class="stat-number" id="today-count">0</p>
+                            <span class="stat-desc">Request masuk</span>
+                        </div>
+                        <div class="stat-trend up">
+                            <i class="ph ph-trend-up"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bento-card stat-card stat-low-stock">
+                        <div class="stat-icon">
+                            <i class="ph ph-warning"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">Stok Menipis</span>
+                            <p class="stat-number" id="low-stock-count">0</p>
+                            <span class="stat-desc">Item perlu restock</span>
+                        </div>
+                        <div class="stat-trend down">
+                            <i class="ph ph-trend-down"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bento-card stat-card stat-total">
+                        <div class="stat-icon">
+                            <i class="ph ph-package"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">Total Item</span>
+                            <p class="stat-number" id="total-items-count">0</p>
+                            <span class="stat-desc">Jenis barang</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs Container -->
+                <div class="bento-card tabs-container">
+                    <div class="tabs-header">
+                        <button class="tab-btn active" data-tab="requests">
+                            <i class="ph ph-clipboard-text"></i>
+                            <span>Permintaan</span>
+                            <span class="tab-badge" id="requests-badge">0</span>
+                        </button>
+                        <button class="tab-btn" data-tab="inventory">
+                            <i class="ph ph-package"></i>
+                            <span>Inventaris</span>
+                        </button>
+                        <button class="tab-btn" data-tab="receipt">
+                            <i class="ph ph-truck"></i>
+                            <span>Penerimaan</span>
+                        </button>
+                        <button class="tab-btn" data-tab="reports">
+                            <i class="ph ph-chart-line"></i>
+                            <span>Laporan</span>
+                        </button>
+                    </div>
+
+                    <!-- ==================== REQUESTS TAB ==================== -->
+                    <div id="requests-tab" class="tab-content active">
+                        <div class="tab-content-header">
+                            <div class="tab-title">
+                                <i class="ph ph-clipboard-text"></i>
+                                <div>
+                                    <h2>Daftar Permintaan</h2>
+                                    <p>Kelola semua request office supplies</p>
+                                </div>
+                            </div>
+                            <div class="header-actions">
+                                <button class="btn-secondary" id="refreshRequestsBtn">
+                                    <i class="ph ph-arrows-clockwise"></i>
+                                    <span>Refresh</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Filter Section -->
+                        <div class="filter-section">
+                            <div class="filter-chips">
+                                <button class="filter-chip active" data-filter="all">
+                                    <i class="ph ph-squares-four"></i>
+                                    Semua
+                                </button>
+                                <button class="filter-chip" data-filter="pending">
+                                    <span class="chip-dot pending"></span>
+                                    Tertunda
+                                </button>
+                                <button class="filter-chip" data-filter="approved">
+                                    <span class="chip-dot approved"></span>
+                                    Disetujui
+                                </button>
+                                <button class="filter-chip" data-filter="rejected">
+                                    <span class="chip-dot rejected"></span>
+                                    Ditolak
+                                </button>
+                                <button class="filter-chip" data-filter="completed">
+                                    <span class="chip-dot completed"></span>
+                                    Selesai
+                                </button>
+                            </div>
+                            
+                            <div class="search-container">
+                                <div class="search-box">
+                                    <i class="ph ph-magnifying-glass"></i>
+                                    <input type="text" 
+                                           id="search-requests" 
+                                           placeholder="Cari nomor request, nama, atau departemen..."
+                                           autocomplete="off">
+                                    <button type="button" class="btn-clear" id="clearSearchRequests" aria-label="Clear search">
+                                        <i class="ph ph-x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Requests Grid -->
+                        <div id="pending-requests" class="requests-grid">
+                            <!-- Skeleton Loading -->
+                            <div class="skeleton-grid" id="requestsSkeletonLoader">
+                                <div class="skeleton-card">
+                                    <div class="skeleton skeleton-header"></div>
+                                    <div class="skeleton skeleton-text"></div>
+                                    <div class="skeleton skeleton-text short"></div>
+                                    <div class="skeleton skeleton-btn"></div>
+                                </div>
+                                <div class="skeleton-card">
+                                    <div class="skeleton skeleton-header"></div>
+                                    <div class="skeleton skeleton-text"></div>
+                                    <div class="skeleton skeleton-text short"></div>
+                                    <div class="skeleton skeleton-btn"></div>
+                                </div>
+                                <div class="skeleton-card">
+                                    <div class="skeleton skeleton-header"></div>
+                                    <div class="skeleton skeleton-text"></div>
+                                    <div class="skeleton skeleton-text short"></div>
+                                    <div class="skeleton skeleton-btn"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ==================== INVENTORY TAB ==================== -->
+                    <div id="inventory-tab" class="tab-content">
+                        <div class="tab-content-header">
+                            <div class="tab-title">
+                                <i class="ph ph-package"></i>
+                                <div>
+                                    <h2>Manajemen Inventaris</h2>
+                                    <p>Kelola stok barang office supplies</p>
+                                </div>
+                            </div>
+                            <div class="header-actions">
+                                <button class="btn-success" id="exportInventoryBtn">
+                                    <i class="ph ph-file-xls"></i>
+                                    <span>Export Excel</span>
+                                </button>
+                                <button class="btn-secondary" id="printInventoryBtn">
+                                    <i class="ph ph-printer"></i>
+                                    <span>Print</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Inventory Summary Cards -->
+                        <div class="inventory-summary">
+                            <div class="summary-card summary-normal">
+                                <div class="summary-icon">
+                                    <i class="ph ph-check-circle"></i>
+                                </div>
+                                <div class="summary-info">
+                                    <span class="summary-label">Stok Normal</span>
+                                    <p class="summary-count" id="normal-items-count">0</p>
+                                </div>
+                            </div>
+                            
+                            <div class="summary-card summary-low">
+                                <div class="summary-icon">
+                                    <i class="ph ph-warning"></i>
+                                </div>
+                                <div class="summary-info">
+                                    <span class="summary-label">Stok Menipis</span>
+                                    <p class="summary-count" id="low-items-count">0</p>
+                                </div>
+                            </div>
+                            
+                            <div class="summary-card summary-empty">
+                                <div class="summary-icon">
+                                    <i class="ph ph-x-circle"></i>
+                                </div>
+                                <div class="summary-info">
+                                    <span class="summary-label">Stok Habis</span>
+                                    <p class="summary-count" id="empty-items-count">0</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add New Item Form -->
+                        <div class="action-card">
+                            <div class="card-header">
+                                <h3><i class="ph ph-plus-circle"></i> Tambah Barang Baru</h3>
+                            </div>
+                            <form id="add-item-form" class="add-item-form">
+                                <div class="form-grid">
+                                    <div class="input-group">
+                                        <label for="itemName">
+                                            <i class="ph ph-package"></i>
+                                            Nama Barang
+                                        </label>
+                                        <div class="input-wrapper">
+                                            <input type="text" 
+                                                   id="itemName" 
+                                                   placeholder="Contoh: Kertas A4" 
+                                                   required
+                                                   minlength="2"
+                                                   maxlength="100">
+                                            <div class="input-focus"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="input-group">
+                                        <label for="itemStock">
+                                            <i class="ph ph-stack"></i>
+                                            Stok Awal
+                                        </label>
+                                        <div class="input-wrapper">
+                                            <input type="number" 
+                                                   id="itemStock" 
+                                                   placeholder="0" 
+                                                   min="0" 
+                                                   required>
+                                            <div class="input-focus"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="input-group">
+                                        <label for="itemUnit">
+                                            <i class="ph ph-ruler"></i>
+                                            Satuan
+                                        </label>
+                                        <div class="input-wrapper">
+                                            <input type="text" 
+                                                   id="itemUnit" 
+                                                   placeholder="pcs/box/rim" 
+                                                   required
+                                                   maxlength="20">
+                                            <div class="input-focus"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="input-group">
+                                        <label for="itemMinStock">
+                                            <i class="ph ph-warning-circle"></i>
+                                            Min. Stok
+                                        </label>
+                                        <div class="input-wrapper">
+                                            <input type="number" 
+                                                   id="itemMinStock" 
+                                                   placeholder="5" 
+                                                   min="0" 
+                                                   value="5"
+                                                   required>
+                                            <div class="input-focus"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn-primary">
+                                    <i class="ph ph-plus"></i>
+                                    <span>Tambah Barang</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Search Inventory -->
+                        <div class="search-container">
+                            <div class="search-box">
+                                <i class="ph ph-magnifying-glass"></i>
+                                <input type="text" 
+                                       id="search-inventory" 
+                                       placeholder="Cari nama barang..."
+                                       autocomplete="off">
+                                <button type="button" class="btn-clear" id="clearSearchInventory" aria-label="Clear search">
+                                    <i class="ph ph-x"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Inventory Grid -->
+                        <div id="inventory-list" class="inventory-grid">
+                            <!-- Skeleton Loading -->
+                            <div class="skeleton-grid" id="inventorySkeletonLoader">
+                                <div class="skeleton-card">
+                                    <div class="skeleton skeleton-header"></div>
+                                    <div class="skeleton skeleton-text"></div>
+                                    <div class="skeleton skeleton-btn"></div>
+                                </div>
+                                <div class="skeleton-card">
+                                    <div class="skeleton skeleton-header"></div>
+                                    <div class="skeleton skeleton-text"></div>
+                                    <div class="skeleton skeleton-btn"></div>
+                                </div>
+                                <div class="skeleton-card">
+                                    <div class="skeleton skeleton-header"></div>
+                                    <div class="skeleton skeleton-text"></div>
+                                    <div class="skeleton skeleton-btn"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ==================== RECEIPT TAB ==================== -->
+                    <div id="receipt-tab" class="tab-content">
+                        <div class="tab-content-header">
+                            <div class="tab-title">
+                                <i class="ph ph-truck"></i>
+                                <div>
+                                    <h2>Penerimaan Barang</h2>
+                                    <p>Input barang masuk dari supplier</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-card">
+                            <div class="card-header">
+                                <h3><i class="ph ph-note-pencil"></i> Detail Penerimaan</h3>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="input-group">
+                                    <label for="receipt-no">
+                                        <i class="ph ph-file-text"></i>
+                                        No. Surat Jalan / PO
+                                    </label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="receipt-no" placeholder="SJ-2025-001">
+                                        <div class="input-focus"></div>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label for="receipt-supplier">
+                                        <i class="ph ph-buildings"></i>
+                                        Supplier / Pengirim
+                                    </label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="receipt-supplier" placeholder="PT. Sumber Rejeki">
+                                        <div class="input-focus"></div>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label for="receipt-date">
+                                        <i class="ph ph-calendar"></i>
+                                        Tanggal Terima
+                                    </label>
+                                    <div class="input-wrapper">
+                                        <input type="date" id="receipt-date">
+                                        <div class="input-focus"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-card">
+                            <div class="card-header">
+                                <h3><i class="ph ph-list-plus"></i> Daftar Barang</h3>
+                                <button class="btn-primary btn-sm" id="addReceiptRowBtn">
+                                    <i class="ph ph-plus"></i>
+                                    <span>Tambah Barang</span>
+                                </button>
+                            </div>
+
+                            <div class="table-container">
+                                <table class="modern-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nama Barang</th>
+                                            <th style="width: 140px;">Jumlah</th>
+                                            <th style="width: 120px;">Satuan</th>
+                                            <th style="width: 80px;">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="receipt-items">
+                                        <!-- Dynamic rows -->
+                                    </tbody>
+                                </table>
+                                
+                                <div class="table-empty" id="receipt-empty">
+                                    <i class="ph ph-package"></i>
+                                    <p>Belum ada barang</p>
+                                    <span>Klik "Tambah Barang" untuk menambahkan</span>
+                                </div>
+                            </div>
+
+                            <div class="card-footer">
+                                <button class="btn-success btn-lg" id="saveReceiptBtn">
+                                    <i class="ph ph-check-square"></i>
+                                    <span>Simpan Penerimaan & Update Stok</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ==================== REPORTS TAB ==================== -->
+                    <div id="reports-tab" class="tab-content">
+                        <div class="tab-content-header">
+                            <div class="tab-title">
+                                <i class="ph ph-chart-line"></i>
+                                <div>
+                                    <h2>Laporan & Analitik</h2>
+                                    <p>Export dan analisis data</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Report Type Selector -->
+                        <div class="action-card">
+                            <div class="card-header">
+                                <h3><i class="ph ph-list-checks"></i> Pilih Jenis Laporan</h3>
+                            </div>
+                            <div class="report-type-selector">
+                                <button class="report-type-btn active" id="btn-report-requests">
+                                    <div class="report-type-icon">
+                                        <i class="ph ph-clipboard-text"></i>
+                                    </div>
+                                    <div class="report-type-info">
+                                        <span class="report-type-title">Laporan Permintaan</span>
+                                        <span class="report-type-desc">Data semua request</span>
+                                    </div>
+                                </button>
+                                <button class="report-type-btn" id="btn-report-stock">
+                                    <div class="report-type-icon">
+                                        <i class="ph ph-arrow-circle-up"></i>
+                                    </div>
+                                    <div class="report-type-info">
+                                        <span class="report-type-title">Histori Stok</span>
+                                        <span class="report-type-desc">Transaksi stok masuk/keluar</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Quick Export Actions -->
+                        <div class="action-card">
+                            <div class="card-header">
+                                <h3><i class="ph ph-file-arrow-down"></i> Export Cepat</h3>
+                            </div>
+                            <div class="quick-export-grid">
+                                <button class="export-btn" id="exportRequestsBtn">
+                                    <i class="ph ph-file-xls"></i>
+                                    <span>Export Permintaan</span>
+                                </button>
+                                <button class="export-btn" id="exportInventoryQuickBtn">
+                                    <i class="ph ph-file-xls"></i>
+                                    <span>Export Inventaris</span>
+                                </button>
+                                <button class="export-btn" id="exportStockBtn">
+                                    <i class="ph ph-file-xls"></i>
+                                    <span>Export Histori Stok</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Filter Report - For Requests -->
+                        <div class="action-card" id="requests-filter-section">
+                            <div class="card-header">
+                                <h3><i class="ph ph-funnel"></i> Filter Laporan Permintaan</h3>
+                            </div>
+                            <div class="filter-form">
+                                <div class="form-grid">
+                                    <div class="input-group">
+                                        <label for="start-date">
+                                            <i class="ph ph-calendar"></i>
+                                            Dari Tanggal
+                                        </label>
+                                        <div class="input-wrapper">
+                                            <input type="date" id="start-date">
+                                            <div class="input-focus"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="input-group">
+                                        <label for="end-date">
+                                            <i class="ph ph-calendar"></i>
+                                            Sampai Tanggal
+                                        </label>
+                                        <div class="input-wrapper">
+                                            <input type="date" id="end-date">
+                                            <div class="input-focus"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="input-group">
+                                        <label for="status-filter">
+                                            <i class="ph ph-funnel-simple"></i>
+                                            Status
+                                        </label>
+                                        <div class="input-wrapper">
+                                            <select id="status-filter">
+                                                <option value="all">Semua Status</option>
+                                                <option value="pending">Tertunda</option>
+                                                <option value="approved">Disetujui</option>
+                                                <option value="rejected">Ditolak</option>
+                                                <option value="completed">Selesai</option>
+                                            </select>
+                                            <i class="ph ph-caret-down select-arrow"></i>
+                                            <div class="input-focus"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button class="btn-primary" id="filter-btn">
+                                        <i class="ph ph-funnel-simple"></i>
+                                        <span>Terapkan Filter</span>
+                                    </button>
+                                    <button class="btn-success" id="export-excel-btn">
+                                        <i class="ph ph-file-arrow-down"></i>
+                                        <span>Export Hasil</span>
+                                    </button>
+                                    <button class="btn-secondary" id="resetFilterBtn">
+                                        <i class="ph ph-arrow-counter-clockwise"></i>
+                                        <span>Reset</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filter Report - For Stock History -->
+                        <div class="action-card" id="stock-filter-section" style="display: none;">
+                            <div class="card-header">
+                                <h3><i class="ph ph-funnel"></i> Filter Histori Stok</h3>
+                            </div>
+                            <div class="filter-form">
+                                <div class="form-grid cols-2">
+                                    <div class="input-group">
+                                        <label for="stock-start-date">
+                                            <i class="ph ph-calendar"></i>
+                                            Dari Tanggal
+                                        </label>
+                                        <div class="input-wrapper">
+                                            <input type="date" id="stock-start-date">
+                                            <div class="input-focus"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="input-group">
+                                        <label for="stock-end-date">
+                                            <i class="ph ph-calendar"></i>
+                                            Sampai Tanggal
+                                        </label>
+                                        <div class="input-wrapper">
+                                            <input type="date" id="stock-end-date">
+                                            <div class="input-focus"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button class="btn-primary" id="applyStockFilterBtn">
+                                        <i class="ph ph-funnel-simple"></i>
+                                        <span>Terapkan Filter</span>
+                                    </button>
+                                    <button class="btn-secondary" id="resetStockFilterBtn">
+                                        <i class="ph ph-arrow-counter-clockwise"></i>
+                                        <span>Reset</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Report Preview -->
+                        <div class="action-card">
+                            <div class="card-header">
+                                <h3><i class="ph ph-eye"></i> Preview Laporan</h3>
+                            </div>
+                            <div id="report-preview" class="report-preview">
+                                <div class="empty-state">
+                                    <div class="empty-icon">
+                                        <i class="ph ph-clipboard"></i>
+                                    </div>
+                                    <h4>Belum Ada Filter</h4>
+                                    <p>Pilih jenis laporan dan filter di atas untuk melihat data</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Glass Footer -->
+        <footer class="glass-footer">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <img src="logo-trakindo.png" alt="Trakindo" class="footer-logo">
+                    <span>© 2025 PT. Trakindo Utama</span>
+                </div>
+                <div class="footer-links">
+                    <a href="#" id="helpLink">Bantuan</a>
+                    <span class="divider">•</span>
+                    <a href="mailto:it.support@trakindo.co.id">IT Support</a>
+                    <span class="divider">•</span>
+                    <a href="index.html">User Portal</a>
+                </div>
+                <div class="footer-version">
+                    <span>Admin v4.0.0</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ============ DATALIST UNTUK AUTOCOMPLETE ============ -->
+    <datalist id="item-datalist"></datalist>
+
+    <!-- ============ TOAST CONTAINER ============ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ============ MODAL BACKDROP ============ -->
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+
+    <!-- ============ CONFIRM MODAL ============ -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content glass-modal">
+            <div class="modal-icon" id="confirmModalIcon">
+                <i class="ph ph-question"></i>
+            </div>
+            <h3 id="confirmModalTitle">Konfirmasi</h3>
+            <p id="confirmModalMessage">Apakah Anda yakin?</p>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="confirmCancelBtn">
+                    <i class="ph ph-x"></i>
+                    <span>Batal</span>
+                </button>
+                <button class="btn-primary" id="confirmOkBtn">
+                    <i class="ph ph-check"></i>
+                    <span>Ya, Lanjutkan</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ 🆕 PROMPT MODAL (BARU) ============ -->
+    <div class="modal" id="promptModal">
+        <div class="modal-content glass-modal">
+            <button class="modal-close" id="closePromptModal" aria-label="Close modal">
+                <i class="ph ph-x"></i>
+            </button>
+            <div class="modal-icon blue" id="promptModalIcon">
+                <i class="ph ph-pencil-simple"></i>
+            </div>
+            <h3 id="promptModalTitle">Input</h3>
+            <p id="promptModalMessage">Masukkan nilai:</p>
+            <div class="modal-body">
+                <div class="input-group">
+                    <div class="input-wrapper">
+                        <input type="text" 
+                               id="promptModalInput" 
+                               placeholder=""
+                               autocomplete="off">
+                        <div class="input-focus"></div>
+                    </div>
+                    <span class="input-error" id="promptModalError"></span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="promptCancelBtn">
+                    <span>Batal</span>
+                </button>
+                <button class="btn-primary" id="promptOkBtn">
+                    <i class="ph ph-check"></i>
+                    <span>OK</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ EDIT STOCK MODAL ============ -->
+    <div class="modal" id="editStockModal">
+        <div class="modal-content glass-modal">
+            <button class="modal-close" id="closeEditStockModal" aria-label="Close modal">
+                <i class="ph ph-x"></i>
+            </button>
+            <div class="modal-icon blue">
+                <i class="ph ph-pencil-simple"></i>
+            </div>
+            <h3>Edit Stok</h3>
+            <p id="editStockItemName">Nama Barang</p>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="editStockValue">
+                        <i class="ph ph-stack"></i>
+                        Jumlah Stok Baru
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="number" id="editStockValue" min="0" placeholder="0">
+                        <div class="input-focus"></div>
+                    </div>
+                    <span class="input-hint">Stok saat ini: <strong id="currentStockValue">0</strong></span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="cancelEditStockBtn">
+                    <span>Batal</span>
+                </button>
+                <button class="btn-primary" id="saveEditStockBtn">
+                    <i class="ph ph-check"></i>
+                    <span>Simpan</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ BACK TO TOP BUTTON ============ -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">
+        <i class="ph ph-arrow-up"></i>
+    </button>
+
+    <!-- ============ NOSCRIPT FALLBACK ============ -->
+    <noscript>
+        <div style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #0f172a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            z-index: 99999;
+        ">
+            <div>
+                <h1 style="color: #FFAF10; margin-bottom: 20px;">⚠️ JavaScript Required</h1>
+                <p style="max-width: 400px; line-height: 1.6;">
+                    Admin Dashboard memerlukan JavaScript untuk berfungsi dengan baik.
+                    Silakan aktifkan JavaScript di browser Anda dan refresh halaman.
+                </p>
+            </div>
+        </div>
+    </noscript>
+
+    <!-- ============ SCRIPTS ============ -->
+    <!-- 🔄 UPDATED: Load modular admin scripts -->
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="admin/index.js"></script>
+</body>
+</html>

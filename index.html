@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    
+    <meta name="description" content="Office Supplies Request Management System - PT Trakindo Utama">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+    <title>Office Supplies Request - Trakindo</title>
+</head>
+<body>
+    
+    <!-- ============ AMBIENT BACKGROUND ============ -->
+    <div class="ambient-bg">
+        <div class="gradient-sphere sphere-1"></div>
+        <div class="gradient-sphere sphere-2"></div>
+        <div class="gradient-sphere sphere-3"></div>
+        <div class="noise-overlay"></div>
+        <div class="grid-lines"></div>
+    </div>
+
+    <!-- ============ FLOATING PARTICLES ============ -->
+    <div class="particles" id="particles"></div>
+
+    <!-- ============ APP SHELL ============ -->
+    <div class="app-shell">
+        
+        <!-- ======== MINIMAL HEADER ======== -->
+        <header class="top-bar">
+            <div class="top-bar-inner">
+                <!-- Brand -->
+                <a href="/" class="brand-mark">
+                    <div class="brand-logo">
+                        <img src="logo-trakindo.png" alt="Trakindo" class="logo-img">
+                    </div>
+                    <div class="brand-label">
+                        <span class="brand-name">Trakindo</span>
+                        <span class="brand-sub">Office Supplies</span>
+                    </div>
+                </a>
+                
+                <!-- Right Actions -->
+                <div class="top-actions">
+                    <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">
+                        <i class="ph ph-sun-dim" id="iconLight"></i>
+                        <i class="ph ph-moon-stars" id="iconDark" style="display:none"></i>
+                    </button>
+                    
+                    <div class="divider-v"></div>
+                    
+                    <a href="admin.html" class="admin-link">
+                        <i class="ph ph-gear-six"></i>
+                        <span>Admin</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- ======== MAIN STAGE ======== -->
+        <main class="stage">
+            
+            <!-- Hero Text (Contextual - changes per step) -->
+            <div class="hero-section">
+                <div class="hero-badge">
+                    <i class="ph ph-sparkle"></i>
+                    <span id="heroBadgeText">Form Pengajuan ATK</span>
+                </div>
+                <h1 class="hero-title" id="heroTitle">
+                    Ajukan Kebutuhan<br>
+                    <span class="text-gradient">Alat Tulis Kantor</span>
+                </h1>
+                <p class="hero-desc" id="heroDesc">
+                    Butuh ATK? Isi form di bawah ini, lalu kami bantu proses.
+                </p>
+            </div>
+
+            <!-- ======== FORM CARD ======== -->
+            <div class="form-stage">
+                
+                <!-- Integrated Step Indicator -->
+                <div class="step-bar">
+                    <div class="step-track">
+                        <div class="step-fill" id="stepFill" style="width: 33.33%"></div>
+                    </div>
+                    <div class="step-labels">
+                        <button class="step-label active" data-step="1" id="stepLabel1">
+                            <span class="step-num">1</span>
+                            <span class="step-text">Data Diri</span>
+                        </button>
+                        <button class="step-label" data-step="2" id="stepLabel2">
+                            <span class="step-num">2</span>
+                            <span class="step-text">Pilih Barang</span>
+                        </button>
+                        <button class="step-label" data-step="3" id="stepLabel3">
+                            <span class="step-num">3</span>
+                            <span class="step-text">Kirim</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Glass Form Card -->
+                <div class="form-card">
+                    <form id="requestForm" novalidate>
+                        
+                        <!-- ====== STEP 1: DATA DIRI ====== -->
+                        <div class="step-panel active" data-step="1" id="stepPanel1">
+                            
+                            <div class="panel-header">
+                                <div class="panel-icon">
+                                    <i class="ph-fill ph-user-circle"></i>
+                                </div>
+                                <div>
+                                    <h2 class="panel-title">Informasi Pemohon</h2>
+                                    <p class="panel-desc">Lengkapi data diri Anda untuk memproses pengajuan</p>
+                                </div>
+                            </div>
+
+                            <div class="fields-grid">
+                                <!-- Nama Lengkap -->
+                                <div class="field full-width">
+                                    <label class="field-label" for="nama">
+                                        <i class="ph ph-identification-badge"></i>
+                                        Nama Lengkap
+                                        <span class="required-dot"></span>
+                                    </label>
+                                    <div class="field-input-wrap">
+                                        <input 
+                                            type="text" 
+                                            id="nama" 
+                                            name="nama"
+                                            class="field-input"
+                                            placeholder="Masukkan nama sesuai ID karyawan"
+                                            autocomplete="name"
+                                            required
+                                        >
+                                        <div class="field-border"></div>
+                                        <div class="field-status">
+                                            <i class="ph ph-check-circle"></i>
+                                        </div>
+                                    </div>
+                                    <span class="field-error" id="namaError"></span>
+                                </div>
+
+                                <!-- Departemen -->
+                                <div class="field">
+                                    <label class="field-label" for="departemen">
+                                        <i class="ph ph-buildings"></i>
+                                        Departemen
+                                        <span class="required-dot"></span>
+                                    </label>
+                                    <div class="field-input-wrap">
+                                        <select id="departemen" name="departemen" class="field-input field-select" required>
+                                            <option value="">Pilih Departemen</option>
+                                            <option value="IT">IT / Information Technology</option>
+                                            <option value="HRD">HRD / Human Resources</option>
+                                            <option value="Finance">Finance / Accounting</option>
+                                            <option value="Marketing">Marketing / Sales</option>
+                                            <option value="Product Support">Product Support</option>
+                                            <option value="Procurement">Sourcing & Procurement</option>
+                                            <option value="PPSC">PPSC</option>
+                                            <option value="OSM">OSM</option>
+                                            <option value="LEGAL">LEGAL</option>
+                                            <option value="SHE">SHE</option>
+                                            <option value="CORCOM">CORCOM</option>
+                                            <option value="GOVREL">GOVREL</option>
+                                            <option value="Other">Lainnya</option>
+                                        </select>
+                                        <div class="field-border"></div>
+                                        <i class="ph ph-caret-down field-caret"></i>
+                                    </div>
+                                    <span class="field-error" id="deptError"></span>
+                                </div>
+
+                                <!-- No Contact -->
+                                <div class="field">
+                                    <label class="field-label" for="telepon">
+                                        <i class="ph ph-phone"></i>
+                                        No Contact
+                                        <span class="optional-tag">Opsional</span>
+                                    </label>
+                                    <div class="field-input-wrap">
+                                        <input 
+                                            type="tel" 
+                                            id="telepon" 
+                                            name="telepon"
+                                            class="field-input"
+                                            placeholder="Ext kantor atau nomor HP"
+                                            autocomplete="tel"
+                                        >
+                                        <div class="field-border"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="field full-width">
+                                    <label class="field-label" for="email">
+                                        <i class="ph ph-envelope-simple"></i>
+                                        Email Korporat
+                                        <span class="required-dot"></span>
+                                    </label>
+                                    <div class="field-input-wrap">
+                                        <input 
+                                            type="email" 
+                                            id="email" 
+                                            name="email"
+                                            class="field-input"
+                                            placeholder="nama@trakindo.co.id"
+                                            autocomplete="email"
+                                            required
+                                        >
+                                        <div class="field-border"></div>
+                                        <div class="field-status">
+                                            <i class="ph ph-check-circle"></i>
+                                        </div>
+                                    </div>
+                                    <span class="field-hint">
+                                        <i class="ph ph-info"></i>
+                                        Notifikasi status pengajuan akan dikirim ke email ini
+                                    </span>
+                                    <span class="field-error" id="emailError"></span>
+                                </div>
+                            </div>
+
+                            <!-- Step Actions -->
+                            <div class="step-actions">
+                                <div class="step-actions-left">
+                                    <!-- empty for alignment -->
+                                </div>
+                                <button type="button" class="btn-next" id="toStep2">
+                                    <span>Pilih Barang</span>
+                                    <i class="ph ph-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ====== STEP 2: PILIH BARANG ====== -->
+                        <div class="step-panel" data-step="2" id="stepPanel2">
+                            
+                            <div class="panel-header">
+                                <div class="panel-icon">
+                                    <i class="ph-fill ph-package"></i>
+                                </div>
+                                <div>
+                                    <h2 class="panel-title">Pilih Barang</h2>
+                                    <p class="panel-desc">Cari dan tambahkan barang yang dibutuhkan</p>
+                                </div>
+                            </div>
+
+                            <!-- Search & Filter -->
+                            <div class="search-section">
+                                <div class="search-input-wrap">
+                                    <i class="ph ph-magnifying-glass search-icon"></i>
+                                    <input 
+                                        type="text" 
+                                        id="searchItems" 
+                                        class="search-input"
+                                        placeholder="Cari nama barang..."
+                                        autocomplete="off"
+                                    >
+                                    <button type="button" class="search-clear" id="clearSearch" aria-label="Clear search">
+                                        <i class="ph ph-x"></i>
+                                    </button>
+                                </div>
+                                <div class="filter-chips">
+                                    <button type="button" class="chip active" data-filter="all">
+                                        Semua
+                                    </button>
+                                    <button type="button" class="chip" data-filter="available">
+                                        <span class="chip-dot green"></span>
+                                        Tersedia
+                                    </button>
+                                    <button type="button" class="chip" data-filter="low">
+                                        <span class="chip-dot orange"></span>
+                                        Stok Menipis
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Items Area -->
+                            <div class="items-area">
+                                <!-- Skeleton Loader -->
+                                <div class="skeleton-list" id="skeletonLoader">
+                                    <div class="skel-row"><div class="skel skel-icon"></div><div class="skel skel-line"></div><div class="skel skel-btn"></div></div>
+                                    <div class="skel-row"><div class="skel skel-icon"></div><div class="skel skel-line"></div><div class="skel skel-btn"></div></div>
+                                    <div class="skel-row"><div class="skel skel-icon"></div><div class="skel skel-line"></div><div class="skel skel-btn"></div></div>
+                                    <div class="skel-row"><div class="skel skel-icon"></div><div class="skel skel-line"></div><div class="skel skel-btn"></div></div>
+                                    <div class="skel-row"><div class="skel skel-icon"></div><div class="skel skel-line"></div><div class="skel skel-btn"></div></div>
+                                </div>
+
+                                <!-- Actual Items (Rendered by JS) -->
+                                <div class="items-list" id="itemsList"></div>
+
+                                <!-- No Results -->
+                                <div class="empty-state" id="noResults" style="display:none">
+                                    <div class="empty-icon">
+                                        <i class="ph ph-magnifying-glass-minus"></i>
+                                    </div>
+                                    <h4>Barang tidak ditemukan</h4>
+                                    <p>Coba kata kunci lain atau reset filter</p>
+                                    <button type="button" class="btn-ghost" id="resetFilter">
+                                        <i class="ph ph-arrow-counter-clockwise"></i>
+                                        Reset
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Selected Items Summary (Inline Cart) -->
+                            <div class="selection-summary" id="selectionSummary" style="display:none">
+                                <div class="summary-header">
+                                    <div class="summary-title">
+                                        <i class="ph ph-shopping-bag"></i>
+                                        <span>Barang Dipilih</span>
+                                        <span class="summary-count" id="summaryCount">0</span>
+                                    </div>
+                                    <button type="button" class="btn-ghost-sm" id="toggleSummary">
+                                        <i class="ph ph-caret-up" id="summaryToggleIcon"></i>
+                                    </button>
+                                </div>
+                                <div class="summary-body" id="summaryBody">
+                                    <ul class="summary-list" id="summaryList"></ul>
+                                    <div class="summary-total">
+                                        <span>Total Item</span>
+                                        <strong id="summaryTotal">0</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step Actions -->
+                            <div class="step-actions">
+                                <button type="button" class="btn-back" id="backToStep1">
+                                    <i class="ph ph-arrow-left"></i>
+                                    <span>Kembali</span>
+                                </button>
+                                <button type="button" class="btn-next" id="toStep3" disabled>
+                                    <span>Review Pengajuan</span>
+                                    <i class="ph ph-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ====== STEP 3: REVIEW & KIRIM ====== -->
+                        <div class="step-panel" data-step="3" id="stepPanel3">
+                            
+                            <div class="panel-header">
+                                <div class="panel-icon">
+                                    <i class="ph-fill ph-paper-plane-tilt"></i>
+                                </div>
+                                <div>
+                                    <h2 class="panel-title">Review & Kirim</h2>
+                                    <p class="panel-desc">Periksa kembali sebelum mengirim pengajuan</p>
+                                </div>
+                            </div>
+
+                            <!-- Review Sections -->
+                            <div class="review-sections">
+                                
+                                <!-- Pemohon Info -->
+                                <div class="review-block">
+                                    <div class="review-block-header">
+                                        <div class="review-block-title">
+                                            <i class="ph ph-user"></i>
+                                            <span>Data Pemohon</span>
+                                        </div>
+                                        <button type="button" class="btn-edit" data-goto="1">
+                                            <i class="ph ph-pencil-simple"></i>
+                                            <span>Ubah</span>
+                                        </button>
+                                    </div>
+                                    <div class="review-block-body" id="reviewUserInfo">
+                                        <!-- Filled by JS -->
+                                    </div>
+                                </div>
+
+                                <!-- Items List -->
+                                <div class="review-block">
+                                    <div class="review-block-header">
+                                        <div class="review-block-title">
+                                            <i class="ph ph-package"></i>
+                                            <span>Barang yang Diajukan</span>
+                                        </div>
+                                        <button type="button" class="btn-edit" data-goto="2">
+                                            <i class="ph ph-pencil-simple"></i>
+                                            <span>Ubah</span>
+                                        </button>
+                                    </div>
+                                    <div class="review-block-body">
+                                        <ul class="review-items-list" id="reviewItems"></ul>
+                                        <div class="review-total-row">
+                                            <span>Total Item</span>
+                                            <strong id="reviewTotal">0</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Notes -->
+                            <div class="field full-width">
+                                <label class="field-label" for="catatan">
+                                    <i class="ph ph-note-pencil"></i>
+                                    Catatan Tambahan
+                                    <span class="optional-tag">Opsional</span>
+                                </label>
+                                <div class="field-input-wrap">
+                                    <textarea 
+                                        id="catatan" 
+                                        name="catatan"
+                                        class="field-input field-textarea"
+                                        rows="3"
+                                        placeholder="Contoh: Dibutuhkan untuk meeting tanggal 25 Januari 2025"
+                                    ></textarea>
+                                    <div class="field-border"></div>
+                                </div>
+                            </div>
+
+                            <!-- Agreement -->
+                            <label class="agreement-box">
+                                <input type="checkbox" id="agreement" required>
+                                <div class="agreement-check">
+                                    <i class="ph-bold ph-check"></i>
+                                </div>
+                                <span class="agreement-text">
+                                    Saya menyatakan bahwa data yang diisi sudah benar dan pengajuan ini 
+                                    untuk keperluan operasional perusahaan.
+                                </span>
+                            </label>
+
+                            <!-- Step Actions -->
+                            <div class="step-actions">
+                                <button type="button" class="btn-back" id="backToStep2">
+                                    <i class="ph ph-arrow-left"></i>
+                                    <span>Kembali</span>
+                                </button>
+                                <button type="submit" class="btn-submit" id="submitBtn" disabled>
+                                    <span class="submit-content">
+                                        <i class="ph-bold ph-paper-plane-tilt"></i>
+                                        <span>Kirim Pengajuan</span>
+                                    </span>
+                                    <span class="submit-loading" style="display:none">
+                                        <div class="spinner"></div>
+                                        <span>Mengirim...</span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- Footer Minimal -->
+            <footer class="stage-footer">
+                <div class="footer-row">
+                    <span>© 2025 PT Trakindo Utama</span>
+                    <span class="footer-sep">•</span>
+                    <a href="mailto:facility.m.ho@trakindo.co.id" class="footer-link">
+                        <i class="ph ph-envelope-simple"></i>
+                        Bantuan
+                    </a>
+                    <span class="footer-sep">•</span>
+                    <span class="footer-version">v4.0</span>
+                </div>
+            </footer>
+
+        </main>
+    </div>
+
+    <!-- ============ TOAST CONTAINER ============ -->
+    <div class="toast-stack" id="toastStack"></div>
+
+    <!-- ============ SUCCESS MODAL ============ -->
+    <div class="overlay" id="overlay"></div>
+    <div class="modal-success" id="successModal">
+        <div class="modal-inner">
+            
+            <!-- Animated Check -->
+            <div class="success-anim">
+                <svg class="checkmark-svg" viewBox="0 0 100 100">
+                    <circle class="checkmark-circle" cx="50" cy="50" r="45" fill="none" stroke-width="4"/>
+                    <path class="checkmark-path" d="M30 50 L45 65 L70 35" fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+
+            <h2>Pengajuan Berhasil!</h2>
+            <p>Pengajuan Anda telah dikirim dan akan segera diproses oleh tim General Services.</p>
+
+            <div class="result-card">
+                <div class="result-row">
+                    <span class="result-label">Nomor Pengajuan</span>
+                    <span class="result-value mono" id="requestNumber">REQ-2025-0001</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Estimasi Proses</span>
+                    <span class="result-value">2-3 Hari Kerja</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Status</span>
+                    <span class="result-badge">
+                        <span class="pulse-dot"></span>
+                        Menunggu Persetujuan
+                    </span>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="btn-outline" id="newRequestBtn">
+                    <i class="ph ph-plus"></i>
+                    Pengajuan Baru
+                </button>
+                <button class="btn-primary-modal" id="closeModalBtn">
+                    <i class="ph ph-check"></i>
+                    Selesai
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ FLOATING HELP ============ -->
+    <button class="fab-help" id="fabHelp" aria-label="Bantuan">
+        <i class="ph ph-question"></i>
+    </button>
+
+    <!-- Help Popover -->
+    <div class="help-popover" id="helpPopover">
+        <div class="help-popover-header">
+            <h4>Butuh Bantuan?</h4>
+            <button class="help-close" id="helpClose">
+                <i class="ph ph-x"></i>
+            </button>
+        </div>
+        <div class="help-popover-body">
+            <a href="mailto:facility.m.ho@trakindo.co.id" class="help-option">
+                <div class="help-option-icon">
+                    <i class="ph ph-envelope-simple"></i>
+                </div>
+                <div class="help-option-text">
+                    <span>Email</span>
+                    <small>facility.m.ho@trakindo.co.id</small>
+                </div>
+            </a>
+            <a href="tel:+6281585398523" class="help-option">
+                <div class="help-option-icon">
+                    <i class="ph ph-phone"></i>
+                </div>
+                <div class="help-option-text">
+                    <span>Telepon</span>
+                    <small>+62 815-8539-8523</small>
+                </div>
+            </a>
+            <a href="#" class="help-option" id="faqLink">
+                <div class="help-option-icon">
+                    <i class="ph ph-book-open-text"></i>
+                </div>
+                <div class="help-option-text">
+                    <span>FAQ</span>
+                    <small>Pertanyaan yang sering diajukan</small>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- ============ BACK TO TOP ============ -->
+    <button class="btn-top" id="backToTop" aria-label="Kembali ke atas">
+        <i class="ph ph-arrow-up"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>
